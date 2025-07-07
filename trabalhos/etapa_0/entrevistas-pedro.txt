@@ -1,0 +1,52 @@
+Entrevistado(a): Gilson Cardoso (tio)  
+Profissão: Incorporador Imobiliário
+Idade: 47 anos
+Meio/Local: Conversa no WhatsApp
+Entrevistador: Pedro Henrique Cardoso Silva  
+Data da entrevista: 21/06/2025  
+
+Pedro: Tio, tô fazendo um trabalho da faculdade e preciso entrevistar algumas pessoas. Consegue me ajudar respondendo umas perguntas rapidinho?  
+Gilson: Oi, boa tarde, meu querido sobrinho! Eu te abençoo em nome de Jesus! 🙌 Claro, chegando em casa eu respondo.  
+Pedro: Perfeito. No seu dia a dia de trabalho existe alguma atividade repetitiva que você precise fazer sempre? Tipo contar algo, identificar alguma coisa, essas coisas.  
+Gilson: Tenho sim. Todos os dias preciso passar as tarefas de serviço para a minha equipe, é uma rotina que toma tempo.  
+Pedro: Entendi. No projeto eu preciso desenvolver algo usando visão computacional, tipo câmeras e análise de imagem pra resolver problemas do dia a dia. Alguma aplicação desse tipo ajudaria no seu trabalho?  
+Gilson: Ajudaria. Às vezes os clientes pedem orçamento sem saber as metragens e mandam só fotos. Se existisse um sistema que calculasse a área ou a metragem pela imagem, economizaria muito tempo.  
+Pedro: Acontece com frequência?  
+Gilson: Bastante. Perco tempo tentando estimar medidas olhando a foto ou pedindo que o cliente meça de novo.  
+Pedro: Outra coisa... aí na empresa tem entrada e saída de veículos, tipo carros da equipe ou dos funcionários?  
+Gilson: Tem sim, temos alguns carros da empresa e os funcionários pegam eles pra fazer serviço externo.  
+Pedro: E vocês controlam isso como?  
+Gilson: A gente anota manualmente o horário que eles saem e voltam com os carros. Às vezes esquecem de avisar, e aí fica difícil saber quem usou e por quanto tempo.  
+Pedro: Então talvez daria pra fazer um sistema com câmera que identifica a placa do carro na entrada e saída, e já registra o horário automático.  
+Gilson: Nossa, seria excelente! Facilitaria muito esse controle. Já resolveria vários atrasos e esquecimentos que a gente tem.  
+Pedro: Legal demais, tio. Isso já me ajuda muito no projeto.  
+Gilson: Que bom! Pode colocar aí no trabalho, sem problema.  
+Pedro: Posso registrar seu nome, idade e profissão?  
+Gilson: Pode sim, sem problema. Fica com Deus!  
+Pedro: Obrigado, tio. Abraço!
+
+Entrevista 4 – Miguel Ribeiro  
+Entrevistado(a): Miguel Santos Ribeiro  
+Profissão: Técnico de refrigeração e ar condicionado  
+Formação: Ensino Médio completo  
+Idade: 22  
+Meio/Local: Conversa no WhatsApp  
+Entrevistador: Pedro Henrique Cardoso Silva  
+Data da entrevista: 18/06/2025  
+
+Pedro: salve guel  
+Pedro: mano, tô fazendo um trampo da faculdade e queria trocar uma ideia contigo, tipo uma entrevista que vou precisar adicionar no trabalho
+Pedro: é um projeto de visão computacional
+Pedro: basicamente usar câmera pra resolver problema real, tipo reconhecer objetos, coisas assim  
+Pedro: aí tô entrevistando pessoas de outras áreas, pra ver onde isso poderia ajudar, consegue me ajudar nessa?
+miguel: sim mano, manda aí
+Pedro: tipo no seu trabalho, rola alguma parada que daria pra facilitar com uma câmera ou análise de imagem?  
+miguel: acho que sim
+miguel: quando a gente vai fazer manutenção ou instalação, tem que preencher a ordem de serviço e tem um campo que precisa listar os componentes
+miguel: tem que listar todas as peças, talvez daria pra automatizar
+Pedro: mano, e se tivesse um sistema com câmera, tipo um app, que você apontasse pro que usou e ele reconhecesse as peças e já preenchesse a ordem de serviço ou alguma coisa assim?  
+miguel: iria ajudar
+miguel: tipo, terminar o serviço, tirar foto e o sistema já listar tudo que estava na imagem  
+Pedro: fechou mano, acho que já dá pra levar isso para o trabalho, posso usar seu nome, idade e profissão no trabalho, preciso desses dados pra enviar no moodle e adicionar no trabalho
+miguel: pode sim, sem problema  
+Pedro: valeu mano, tmj
