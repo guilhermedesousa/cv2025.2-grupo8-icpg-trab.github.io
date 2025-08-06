@@ -15,9 +15,12 @@ import numpy as np
 import pytesseract
 import re
 import time
+import math
 import os
 from datetime import datetime
+from PIL import Image
 import json
+
 
 class LicensePlateDetector:
     def __init__(self):
@@ -28,9 +31,9 @@ class LicensePlateDetector:
         self.min_area = 2000
         self.max_area = 50000
         self.min_width = 80
-        self.min_height = 30
-        self.max_width = 300
-        self.max_height = 150
+        self.min_height = 10
+        self.max_width = 600
+        self.max_height = 300
         
         # Configuração do Tesseract
         pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
@@ -67,13 +70,13 @@ class LicensePlateDetector:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
         # Filtragem de imagens - Filtro Gaussiano para redução de ruído
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        blurred = cv2.GaussianBlur(gray, (3, 3), 0)
         
         # Equalização de histograma para melhorar contraste
-        equalized = cv2.equalizeHist(blurred)
+        # equalized = cv2.equalizeHist(blurred)
         
         # Detecção de bordas usando Canny
-        edges = cv2.Canny(equalized, 50, 200)
+        edges = cv2.Canny(blurred, 50, 200)
         
         # Operações morfológicas para conectar componentes
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
@@ -89,7 +92,7 @@ class LicensePlateDetector:
         Saída: Imagem da placa recortada com o ROI (Region of Interest)
         """
         # Encontrar contornos
-        contours, _ = cv2.findContours(processed_image, cv2.RETR_EXTERNAL, 
+        contours, _ = cv2.findContours(processed_image, cv2.RETR_TREE, 
                                      cv2.CHAIN_APPROX_SIMPLE)
         
         potential_plates = []
@@ -101,24 +104,51 @@ class LicensePlateDetector:
                 continue
             
             # Aproximar contorno para polígono
-            epsilon = 0.02 * cv2.arcLength(contour, True)
+            epsilon = 0.018 * cv2.arcLength(contour, True)
             approx = cv2.approxPolyDP(contour, epsilon, True)
+            
+            # Considerar apenas contornos com 4 vértices (retângulos)
+            # if len(approx) != 4:
+            #     continue
             
             # Calcular bounding rectangle
             x, y, w, h = cv2.boundingRect(contour)
             
             # Verificar proporções típicas de placa
-            aspect_ratio = w / h
-            if (aspect_ratio < 2.0 or aspect_ratio > 5.0 or
+            aspect_ratio = w / float(h)
+            print(f"Aspect Ratio: {aspect_ratio}")
+            print(f"Width: {w}, Height: {h}")
+            color = (0, 255, 0)
+            if (aspect_ratio < 1.5 or aspect_ratio > 6.0 or
                 w < self.min_width or w > self.max_width or
                 h < self.min_height or h > self.max_height):
                 continue
+                # color = (0, 0, 255)
             
             # Calcular solidez (área do contorno / área do retângulo)
             rect_area = w * h
-            solidity = area / rect_area
-            if solidity < 0.7:
+            if rect_area == 0:
                 continue
+            
+            solidity = area / float(rect_area)
+            if solidity < 0.2:
+                continue
+            
+            # Adicionar verificação de ângulo usando minAreaRect
+            rect = cv2.minAreaRect(contour)
+            angle = rect[2]
+            if angle < -45:
+                angle = 90 + angle
+            
+            print(f"Angle: {angle}")
+            # if abs(angle) > 25: # Ignorar placas muito inclinadas
+            #     continue
+            
+            # cv2.rectangle(original_frame, (x, y), (x+w, y+h), color, 2)
+            # cv2.putText(original_frame, str(aspect_ratio), (x, y-10), 
+            #               cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+            
+            # cv2.imshow('Teste', original_frame)
             
             potential_plates.append({
                 'contour': contour,
@@ -132,7 +162,7 @@ class LicensePlateDetector:
         potential_plates.sort(key=lambda x: x['area'], reverse=True)
         
         plates = []
-        for plate_info in potential_plates[:3]:  # Considerar até 3 melhores candidatos
+        for plate_info in potential_plates[:5]:  # Considerar até 5 melhores candidatos
             x, y, w, h = plate_info['bbox']
             
             # Expandir ROI ligeiramente
@@ -187,12 +217,15 @@ class LicensePlateDetector:
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
         cleaned = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
         
+        cv2.imshow('Imagem Limpa', cleaned)
+        
         # Configuração do Tesseract para placas brasileiras
         config = '--oem 3 --psm 8 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         
         try:
             # Reconhecimento de texto
             text = pytesseract.image_to_string(cleaned, config=config)
+            print(f"Reconhecimento OCR: {text}")
             text = text.strip().upper()
             
             # Filtrar apenas caracteres alfanuméricos
@@ -284,8 +317,13 @@ class LicensePlateDetector:
         # Bloco: Pré-processamento
         processed_frame, gray, edges = self.preprocess_image(frame)
         
+        cv2.imshow('Imagem Pré-Processada', processed_frame)
+        cv2.imshow('Imagem em Escala de Cinza', gray)
+        cv2.imshow('Imagem com Bordas', edges)
+        
         # Bloco: Detecção de Placa
         plates = self.detect_license_plate(edges, processed_frame)
+        print(f"Placas detectadas: {len(plates)}")
         
         detected_text = ""
         
@@ -418,8 +456,7 @@ def main():
     if choice == "1":
         detector.run_video_detection()
     elif choice == "2":
-        # image_path = input("Digite o caminho da imagem: ").strip()
-        image_path = "/home/guilherme/Documents/dev/cv2025.2-grupo8-icpg-trab.github.io/trabalhos/teste/screenshot_20250804_195355.jpg"
+        image_path = input("Digite o caminho da imagem: ").strip()
         detector.test_with_image(image_path)
     elif choice == "3":
         video_path = input("Digite o caminho do vídeo: ").strip()
