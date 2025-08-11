@@ -1,0 +1,10 @@
+.venv
+__pycache__/
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+
+.exe

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Placa Mercosul Customizada</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Oswald:wght@700&display=swap');
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .plate-preview {
+            margin-top: 30px;
+        }
+
+        .plate {
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .plate-header {
+            background-color: #003399;
+            color: white;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mercosul-logo {
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .mercosul-logo img {
+            width: 20px;
+            margin-right: 5px;
+        }
+
+        .plate-title {
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .country-flag img {
+            width: 35px;
+            height: auto;
+            display: block;
+        }
+
+        .plate-main {
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .qr-code {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 30px;
+        }
+
+        .br-logo {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .plate-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: #000;
+            line-height: 1;
+            padding: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            word-break: break-all;
+        }
+        
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gerador de Placa Mercosul</h1>
+        <p>Personalize os textos da placa abaixo. A atualização é em tempo real.</p>
+        
+        <div class="input-group">
+            <label for="mainTextInput">Texto Principal da Placa</label>
+            <input type="text" id="mainTextInput" value="SEU TEXTO" maxlength="10" oninput="updatePlate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="titleTextInput">Texto do Topo (Azul)</label>
+            <input type="text" id="titleTextInput" value="BRASIL" maxlength="15" oninput="updatePlate()">
+        </div>
+
+        <div class="plate-preview">
+            <div class="plate" id="plate">
+                <div class="plate-header">
+                    <div class="mercosul-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Mercosur_logo.svg/240px-Mercosur_logo.svg.png" alt="Logo Mercosul" onerror="this.style.display='none'">
+                        <span>MERCOSUL</span>
+                    </div>
+                    <div class="plate-title" id="plateTitle">BRASIL</div>
+                    <div class="country-flag">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/255px-Flag_of_Brazil.svg.png" alt="Bandeira do Brasil" onerror="this.style.display='none'">
+                    </div>
+                </div>
+                <div class="plate-main">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" class="qr-code" alt="QR Code" onerror="this.style.display='none'">
+                    <span class="br-logo">BR</span>
+                    <div class="plate-text" id="plateText">SEU TEXTO</div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="disclaimer">Aviso: Esta ferramenta é apenas para fins de entretenimento. As placas geradas não são oficiais e não têm validade legal.</p>
+
+    </div>
+
+    <script>
+        function updatePlate() {
+            const mainTextInput = document.getElementById('mainTextInput').value;
+            const titleTextInput = document.getElementById('titleTextInput').value;
+            
+            const plateText = document.getElementById('plateText');
+            const plateTitle = document.getElementById('plateTitle');
+            
+            plateText.textContent = mainTextInput || 'SEU TEXTO';
+            plateTitle.textContent = titleTextInput || 'BRASIL';
+        }
+
+        // Garante que a placa seja exibida corretamente no carregamento inicial
+        document.addEventListener('DOMContentLoaded', updatePlate);
+    </script>
+</body>
+</html>
