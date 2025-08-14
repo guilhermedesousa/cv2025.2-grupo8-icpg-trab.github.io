@@ -172,7 +172,7 @@ class BrazilianPlateRecognizer:
 
     def load_haar_cascade(self):
         """Carrega Haar local ou fallback do OpenCV."""
-        local = os.path.join(os.path.dirname(__file__), 'trabalhos', 'haarcascade_russian_plate_number.xml')
+        local = os.path.join(os.path.dirname(__file__), 'trabalhos/projeto', 'haarcascade_russian_plate_number.xml')
         if os.path.exists(local):
             self.plate_cascade = cv2.CascadeClassifier(local)
             print(f"✅ Haar Cascade carregado: {local}")
