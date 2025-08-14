@@ -1,1 +1,173 @@
-<html></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etapa 5 | Reconhecedor de Placas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary: #2563eb;
+        --secondary: #111827;
+        --accent: #e11d48;
+        --bg: #f5f6fa;
+        --white: #fff;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --radius: 8px;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        --transition: 0.2s;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { background: var(--bg); color: var(--secondary); font-family: "Roboto", sans-serif; font-size: 17px; line-height: 1.6; min-height: 100vh; }
+      body { display: flex; flex-direction: column; min-height: 100vh; }
+      main.container { max-width: 900px; margin: 0 auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 24px 24px 24px; margin-bottom: 32px; margin-top: 24px; }
+      section { margin-bottom: 36px; }
+      h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); margin-bottom: 18px; letter-spacing: 0.2px; }
+      h3 { font-size: 1.1rem; font-weight: 500; color: var(--secondary); margin-bottom: 12px; }
+      h4 { font-size: 1rem; font-weight: 500; color: var(--primary); margin-bottom: 8px; }
+      p.lead { color: var(--gray); margin-bottom: 12px; }
+      ul { margin-left: 18px; margin-bottom: 12px; }
+      li { margin-bottom: 6px; }
+      .section { background: #f3f4f6; padding: 18px 14px; border-radius: var(--radius); margin-bottom: 18px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .grid-1 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+      table { width: 100%; border-collapse: collapse; margin: 12px 0 18px 0; }
+      th, td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+      th { background: var(--primary); color: var(--white); }
+      tr:nth-child(even) { background: #f9fafb; }
+      tr:nth-child(odd) { background: #f3f4f6; }
+      code, kbd { background: #111827; color: #f9fafb; padding: 2px 6px; border-radius: 6px; font-size: 0.95em; }
+      kbd { background: #1f2937; border: 1px solid #374151; }
+      .callout { background: #eef2ff; border-left: 4px solid var(--primary); padding: 12px 12px; border-radius: 6px; margin: 8px 0 14px; }
+      .muted { color: var(--gray); }
+      img.screenshot { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); }
+      footer.rodape { text-align: center; padding: 24px 0 18px 0; color: white; font-size: 0.98em; border-top: 1px solid var(--border); background: #00420c; margin-top: auto; }
+      @media (max-width: 700px) {
+        main.container { padding: 18px 6px 12px 6px; }
+        h2 { font-size: 1.1rem; }
+        h3 { font-size: 1rem; }
+        .grid { grid-template-columns: 1fr; }
+      }
+      hr { margin: 24px 0; }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section id="cabecalho">
+        <h2>Roteiro do Laboratório Experimental – Sistema de Reconhecimento de Placas</h2>
+        <p class="lead">Este roteiro orienta a execução, coleta de resultados e avaliação do sistema de leitura automática de placas de veículos.</p>
+      </section>
+
+      <section id="introducao">
+        <h3>Introdução</h3>
+        <div class="section">
+          <p><strong>O que o sistema faz:</strong> detecta regiões de placa em imagens ou vídeo e aplica OCR para extrair o texto. A interface principal, no modo câmera, mostra o vídeo ao vivo com caixas nas regiões detectadas, o texto da placa confirmado e o FPS no canto superior direito.</p>
+          <br>
+          <div class="grid">
+            <div>
+              <h4>Modos de uso</h4>
+              <ul>
+                <li><strong>Imagem estática</strong>: executar passando o caminho da imagem; retorna as placas detectadas no terminal.</li>
+                <li><strong>Câmera em tempo real</strong>: abrir a janela de vídeo, detectar a placa periodicamente e exibir a última placa confirmada na sobreposição.</li>
+              </ul>
+              <div class="callout">
+                <p><strong>Atalhos da janela:</strong> <kbd>q</kbd> sair, <kbd>d</kbd> alterna <em>debug</em>, <kbd>p</kbd> pausar/continuar.</p>
+              </div>
+            </div>
+            <div>
+              <h4>Como o OCR funciona</h4>
+              <ul>
+                <li><strong>Motores de OCR</strong>: <em>Tesseract</em>, <em>EasyOCR</em> ou <em>Dual</em> (ambos).</li>
+                <li><strong>Execução paralela</strong>: OCR roda em processos separados para não travar a UI.</li>
+                <li><strong>Presets</strong>: <em>rápido</em> (padrão) ou <em>ultra</em> (mais FPS, menos acurácia).</li>
+                <li><strong>Validação</strong>: formata e valida placas no padrão brasileiro (ABC-1D23 / ABC-1234).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="grid" style="margin-top: 10px;">
+            <div>
+              <h4>Diagrama de Blocos</h4>
+              <img src="./../etapa_2/block-diagram-license-plate.png" alt="Diagrama de Blocos - Reconhecimento de placas" class="screenshot" />
+              <p class="muted">Fluxo: Câmera ▶ Captura ▶ Pré-processamento ▶ Detecção de placa ▶ OCR ▶ Exibição/Registro.</p>
+            </div>
+            <div>
+              <h4>Parâmetros principais (CLI)</h4>
+              <table>
+                <thead>
+                  <tr><th>Parâmetro</th><th>Descrição</th><th>Exemplo</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>--camera</code></td><td>Usa câmera em tempo real</td><td><code>--camera</code></td></tr>
+                  <tr><td><code>--cam-index</code></td><td>Índice da câmera</td><td><code>--cam-index 0</code></td></tr>
+                  <tr><td><code>--ocr-engine</code></td><td><code>tesseract</code> | <code>easyocr</code> | <code>dual</code></td><td><code>--ocr-engine dual</code></td></tr>
+                  <tr><td><code>--ultra</code></td><td>Preset Ultra (mais FPS)</td><td><code>--ultra</code></td></tr>
+                  <tr><td><code>--no-haar</code></td><td>Desativa Haar Cascade (usa contornos)</td><td><code>--no-haar</code></td></tr>
+                  <tr><td><code>--pool-size</code></td><td>Nº de processos de OCR</td><td><code>--pool-size 2</code></td></tr>
+                  <tr><td><code>--debug</code></td><td>Logs detalhados</td><td><code>--debug</code></td></tr>
+                  <tr><td><code>image_path</code></td><td>Imagem para modo estático</td><td><code>placa.jpg</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="procedimento">
+        <h3>Procedimento experimental</h3>
+        <div class="section">
+          <h4>A) Modo Imagem Estática</h4>
+          <ol>
+            <li>Separe um conjunto de algumas imagens contendo placas (ângulos e iluminações variadas). Crie uma pasta <code>amostras/</code> e nomeie os arquivos sequencialmente (ex.: <code>img01.jpg</code> … <code>img10.jpg</code>).</li>
+            <li>Execute para cada imagem:
+              <pre><code>python3 plates_recognizer.py --ocr-engine easyocr amostras/img01.jpg</code></pre>
+            </li>
+            <li>Registre a saída impressa no terminal (ex.: <em>Placas detectadas: ["ABC-1D23"]</em>)</li>
+            <li>Repita com <code>--ocr-engine tesseract</code> e depois com <code>--ocr-engine dual</code>.</li>
+          </ol>
+        </div>
+
+        <div class="section">
+          <h4>B) Modo Câmera em Tempo Real</h4>
+          <ol>
+            <li>Conecte a câmera. Garanta boa iluminação e enquadramento frontal do veículo/placa.</li>
+            <li>Execute:
+              <pre><code>python3 plates_recognizer.py --camera --cam-index 0 --ocr-engine easyocr</code></pre>
+            </li>
+            <li>Observe na janela: caixas nas regiões de placa e uma tarja com <strong>Placa:</strong> &lt;texto&gt; e o indicador de <strong>FPS</strong>.</li>
+            <li>Assim que a placa for confirmada, registre a leitura exibida.</li>
+            <li>Repita com <code>--ocr-engine tesseract</code> e <code>--ocr-engine dual</code>.</li>
+          </ol>
+        </div>
+
+        <div class="section">
+          <h4>Resultados esperados</h4>
+          <ul>
+            <li>Saída no terminal com a lista de placas detectadas no modo estático.</li>
+            <li>Janela de vídeo com retângulos nas regiões candidatas; sobreposição com texto da placa confirmada e FPS.</li>
+            <li>Logs de debug opcionais indicando início/fim de tarefas de OCR assíncronas.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="questionario">
+        <h3>Questionário</h3>
+        <div class="section">
+          <p>Escolha apenas uma opção dentre as alternativas</p>
+          <ol>
+            <li>Qual é o objetivo principal de um sistema de reconhecimento de placas de veículos (LRP)?</li>
+            <li>Quais são as duas principais fontes de imagem que um sistema de LPR pode utilizar para análise</li>
+            <li>Antes de tentar ler os caracteres, o que o sistema precisa fazer primeiro na imagem de um veículo</strong></li>
+            <li>Qual é o nome da tecnologia usada para converter a imagem dos caracteres da placa em texto digital?</li>
+            <li>Após extrair o texto da placa, por que é importante ter uma etapa de validação e formatação?</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br />
+      <img src="https://www.ufabc.edu.br/images/conteudo/logo2.png" alt="UFABC Logo" height="32" style="margin-top: 10px" />
+    </footer>
+  </body>
+</html>
