@@ -12,6 +12,7 @@ Recursos:
 - Limite de regiões por frame
 - Fallback do Haar Cascade
 - Debounce de placa confirmada
+- Calibração de câmera para correção de distorção
 
 Atalhos na janela:
   q = sair | d = alterna debug | p = pausa
@@ -105,7 +106,7 @@ class BrazilianPlateRecognizer:
     def __init__(self, use_haar: bool = True, target_w: int = 640,
                  max_regions_per_frame: int = 4, ocr_every: int = 6,
                  preset_ultra: bool = False, pool_size: int = None,
-                 ocr_engine: str = 'easyocr'):
+                 ocr_engine: str = 'easyocr', cam_calib_path: str = None):
         """
         :param use_haar: ativa o Haar Cascade
         :param target_w: largura alvo para processamento
@@ -114,13 +115,24 @@ class BrazilianPlateRecognizer:
         :param preset_ultra: menos variantes/PSMs (mais FPS)
         :param pool_size: nº de processos de OCR
         :param ocr_engine: 'tesseract', 'easyocr' ou 'dual'
+        :param cam_calib_path: caminho para o arquivo de calibração
         """
         self.preset_ultra = preset_ultra
         self.target_w = target_w
         self.max_regions_per_frame = max_regions_per_frame
         self.ocr_every = ocr_every
         self.ocr_engine = ocr_engine
+        self.mtx, self.dist = None, None
 
+        if cam_calib_path and os.path.exists(cam_calib_path):
+            try:
+                data = np.load(cam_calib_path)
+                self.mtx = data['mtx']
+                self.dist = data['dist']
+                print(f"✅ Parâmetros de calibração carregados de {cam_calib_path}")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar calibração: {e}")
+        
         if self.ocr_engine in ['tesseract', 'dual']:
             self.setup_tesseract()
         if self.ocr_engine in ['easyocr', 'dual']:
@@ -172,7 +184,7 @@ class BrazilianPlateRecognizer:
 
     def load_haar_cascade(self):
         """Carrega Haar local ou fallback do OpenCV."""
-        local = os.path.join(os.path.dirname(__file__), 'trabalhos', 'haarcascade_russian_plate_number.xml')
+        local = os.path.join(os.path.dirname(__file__), 'trabalhos/projeto', 'haarcascade_russian_plate_number.xml')
         if os.path.exists(local):
             self.plate_cascade = cv2.CascadeClassifier(local)
             print(f"✅ Haar Cascade carregado: {local}")
@@ -255,6 +267,9 @@ class BrazilianPlateRecognizer:
 
     # ---------- Pipeline por frame (para imagens estáticas) ----------
     def detect_plate_in_frame(self, frame: np.ndarray, debug: bool = False) -> Tuple[List[str], List[Tuple[int,int,int,int]]]:
+        if self.mtx is not None and self.dist is not None:
+            frame = cv2.undistort(frame, self.mtx, self.dist, None)
+        
         proc, scale = self._resize_for_speed(frame)
         regions = self.remove_duplicate_regions(
             self.detect_plate_regions_haar(proc) + self.detect_plate_regions_contour(proc)
@@ -317,7 +332,10 @@ class BrazilianPlateRecognizer:
                     ok, frame = cap.read()
                     if not ok:
                         print("⚠️ Falha ao ler frame."); break
-
+                    
+                    if self.mtx is not None and self.dist is not None:
+                        frame = cv2.undistort(frame, self.mtx, self.dist, None)
+                    
                     # --- Lógica de OCR Assíncrono ---
                     should_start_job = frame_id % self.ocr_every == 0
                     if should_start_job and ocr_job_tess is None and ocr_job_easy is None:
@@ -397,6 +415,75 @@ class BrazilianPlateRecognizer:
             cv2.destroyAllWindows()
             self.close()
 
+    # ---------- Calibração de câmera ----------
+    def calibrate_camera(self, cam_index: int, output_file: str, checkerboard: Tuple[int, int], num_images: int = 15):
+        """
+        Calibra a câmera usando um tabuleiro de xadrez e salva os parâmetros.
+        :param cam_index: Índice da câmera para calibração.
+        :param output_file: Caminho para salvar os parâmetros de calibração.
+        :param checkerboard: Dimensões do tabuleiro de xadrez (e.g., (6, 9)).
+        :param num_images: Número de imagens a serem capturadas para calibração.
+        """
+        cap = cv2.VideoCapture(cam_index)
+        if not cap.isOpened():
+            print(f"❌ Não foi possível abrir a câmera {cam_index}.")
+            return
+        
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        
+        objp = np.zeros((1, checkerboard[0] * checkerboard[1], 3), np.float32)
+        objp[0,:,:2] = np.mgrid[0:checkerboard[0], 0:checkerboard[1]].T.reshape(-1, 2)
+        
+        objpoints = []
+        imgpoints = []
+        count = 0
+        print(f"👀 Prepare o tabuleiro. Capturando {num_images} imagens para calibração. Pressione 's' para salvar, 'q' para sair.")
+        
+        try:
+            while count < num_images:
+                ok, frame = cap.read()
+                if not ok: break
+
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                ret, corners = cv2.findChessboardCorners(gray, checkerboard, None)
+                
+                if ret:
+                    cv2.drawChessboardCorners(frame, checkerboard, corners, ret)
+                    cv2.putText(frame, f"Cantos detectados!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                
+                cv2.putText(frame, f"Imagens capturadas: {count}/{num_images}", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                cv2.imshow("Calibracao de Camera", frame)
+                
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord('s') and ret:
+                    corners2 = cv2.cornerSubPix(gray, corners, (11,11),(-1,-1), (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001))
+                    objpoints.append(objp)
+                    imgpoints.append(corners2)
+                    count += 1
+                    print(f"📸 Imagem {count} capturada.")
+                elif key == ord('q'):
+                    print("❌ Calibração cancelada.")
+                    return
+        finally:
+            cap.release()
+            cv2.destroyAllWindows()
+        
+        if len(objpoints) > 5:
+            try:
+                ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+                if ret:
+                    np.savez(output_file, mtx=mtx, dist=dist)
+                    print(f"✅ Calibração completa. Parâmetros salvos em {output_file}")
+                    print("Matriz da Câmera (mtx):\n", mtx)
+                    print("\nCoeficientes de Distorção (dist):\n", dist)
+                else:
+                    print("❌ Erro na calibração. Não foi possível calcular os parâmetros.")
+            except Exception as e:
+                print(f"❌ Erro ao calibrar a câmera: {e}")
+        else:
+            print("❌ Número insuficiente de imagens para calibração. Tente novamente.")
+
 # --------------- CLI ---------------
 def main():
     parser = argparse.ArgumentParser(description="Reconhecedor de Placas (tempo real + OCR paralelo)")
@@ -407,6 +494,8 @@ def main():
     parser.add_argument('--ultra', action='store_true', help='Preset ULTRA (mais FPS, menos acurácia)')
     parser.add_argument('--pool-size', type=int, default=None, help='Nº de processos de OCR')
     parser.add_argument('--ocr-engine', type=str, default='easyocr', choices=['tesseract', 'easyocr', 'dual'], help='Motor de OCR a ser usado')
+    parser.add_argument('--cam-calib', type=str, default=None, help='Caminho para o arquivo de calibração de câmera (ex: camera_params.npz)')
+    parser.add_argument('--calibrate', action='store_true', help='Modo de calibração de câmera. Use com --camera.')
     parser.add_argument('image_path', nargs='?', help='Caminho da imagem (modo estático)')
     args = parser.parse_args()
 
@@ -414,13 +503,24 @@ def main():
         cv2.setUseOptimized(True)
     except Exception: pass
 
+    if args.calibrate and not args.camera:
+        print("⚠️ O modo de calibração (--calibrate) deve ser usado com a câmera (--camera).")
+        return
+    
+    if args.calibrate:
+        recognizer = BrazilianPlateRecognizer()
+        # Parâmetros para o tabuleiro (ex: 6x9, padrão para calibração)
+        recognizer.calibrate_camera(cam_index=args.cam_index, output_file='camera_params.npz', checkerboard=(6, 8))
+        recognizer.close()
+        return
+
     params = dict(
         target_w=576 if args.ultra else 640,
         max_regions_per_frame=3 if args.ultra else 4,
         ocr_every=8 if args.ultra else 6,
         preset_ultra=args.ultra
     )
-    recognizer = BrazilianPlateRecognizer(use_haar=not args.no_haar, pool_size=args.pool_size, ocr_engine=args.ocr_engine, **params)
+    recognizer = BrazilianPlateRecognizer(use_haar=not args.no_haar, pool_size=args.pool_size, ocr_engine=args.ocr_engine, cam_calib_path=args.cam_calib, **params)
 
     if args.camera:
         recognizer.run_camera(cam_index=args.cam_index, debug=args.debug)
