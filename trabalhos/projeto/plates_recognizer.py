@@ -34,9 +34,10 @@ import argparse
 import numpy as np
 import pytesseract
 import subprocess
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from collections import deque, Counter
 import multiprocessing as mp
+from datetime import datetime
 
 # --------------- Worker de OCR (Tesseract) ---------------
 def _tesseract_worker(payload):
@@ -45,28 +46,85 @@ def _tesseract_worker(payload):
     roi = payload["roi"]
     psm_configs = payload["psm_cfgs"]
     mode = payload["mode"]
+    save_preprocessing = payload.get("save_preprocessing", False)
+    output_dir = payload.get("output_dir", "")
+    region_id = payload.get("region_id", 0)
 
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY) if len(roi.shape) == 3 else roi
-    variants = [gray]
+    variants = []
+    variant_names = []
+    
+    # Variante original
+    variants.append(gray)
+    variant_names.append("01_original_gray")
 
     if mode == "ultra":
-        variants.append(cv2.equalizeHist(gray))
+        eq = cv2.equalizeHist(gray)
+        variants.append(eq)
+        variant_names.append("02_equalized")
+        
         blurred = cv2.GaussianBlur(gray, (5,5), 0)
-        variants.append(cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                              cv2.THRESH_BINARY, 11, 2))
+        adaptive = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                       cv2.THRESH_BINARY, 11, 2)
+        variants.append(adaptive)
+        variant_names.append("03_adaptive_mean")
     else:
-        variants.append(cv2.equalizeHist(gray))
+        eq = cv2.equalizeHist(gray)
+        variants.append(eq)
+        variant_names.append("02_equalized")
+        
         blurred = cv2.GaussianBlur(gray, (5,5), 0)
-        variants.append(cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                              cv2.THRESH_BINARY, 11, 2))
+        variants.append(blurred)
+        variant_names.append("03_gaussian_blur")
+        
+        adaptive = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                       cv2.THRESH_BINARY, 11, 2)
+        variants.append(adaptive)
+        variant_names.append("04_adaptive_gaussian")
+
+    # Salvar etapas de pré-processamento se solicitado
+    if save_preprocessing and output_dir:
+        try:
+            os.makedirs(output_dir, exist_ok=True)
+            # Salvar ROI original
+            cv2.imwrite(os.path.join(output_dir, f"region_{region_id:02d}_00_original_roi.png"), roi)
+            
+            # Salvar cada variante processada
+            for i, (variant, name) in enumerate(zip(variants, variant_names)):
+                filename = f"region_{region_id:02d}_{name}.png"
+                cv2.imwrite(os.path.join(output_dir, filename), variant)
+        except Exception as e:
+            print(f"Erro ao salvar pré-processamento: {e}")
 
     outs = []
-    for v in variants:
-        for cfg in psm_configs:
+    for v_idx, v in enumerate(variants):
+        for cfg_idx, cfg in enumerate(psm_configs):
             try:
                 data = pytesseract.image_to_data(v, config=cfg, output_type=pytesseract.Output.DICT)
+                
+                # Salvar dados detalhados do OCR se solicitado
+                if save_preprocessing and output_dir:
+                    try:
+                        ocr_info_file = os.path.join(output_dir, f"region_{region_id:02d}_ocr_variant_{v_idx:02d}_config_{cfg_idx:02d}.txt")
+                        with open(ocr_info_file, 'w', encoding='utf-8') as f:
+                            f.write(f"Configuração Tesseract: {cfg}\n")
+                            f.write(f"Variante de pré-processamento: {variant_names[v_idx]}\n")
+                            f.write("="*50 + "\n")
+                            
+                            n = len(data['text'])
+                            for i in range(n):
+                                text = (data['text'][i] or "").strip()
+                                conf = int(data['conf'][i]) if data['conf'][i] != '-1' else 0
+                                if text:
+                                    f.write(f"Texto: '{text}' | Confiança: {conf}% | "
+                                           f"Posição: ({data['left'][i]}, {data['top'][i]}) | "
+                                           f"Tamanho: {data['width'][i]}x{data['height'][i]}\n")
+                    except Exception:
+                        pass
+                
             except Exception:
                 continue
+                
             n = len(data['text'])
             for i in range(n):
                 text = (data['text'][i] or "").strip()
@@ -90,7 +148,44 @@ def _easyocr_worker(payload):
         easyocr_reader = easyocr.Reader(['pt'], gpu=False, verbose=False)
 
     roi = payload["roi"]
+    save_preprocessing = payload.get("save_preprocessing", False)
+    output_dir = payload.get("output_dir", "")
+    region_id = payload.get("region_id", 0)
+    
+    # Salvar ROI para EasyOCR se solicitado
+    if save_preprocessing and output_dir:
+        try:
+            os.makedirs(output_dir, exist_ok=True)
+            cv2.imwrite(os.path.join(output_dir, f"region_{region_id:02d}_easyocr_input.png"), roi)
+        except Exception as e:
+            print(f"Erro ao salvar entrada do EasyOCR: {e}")
+    
     results = easyocr_reader.readtext(roi, allowlist='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', paragraph=False)
+    
+    # Salvar resultados do EasyOCR se solicitado
+    if save_preprocessing and output_dir:
+        try:
+            easyocr_info_file = os.path.join(output_dir, f"region_{region_id:02d}_easyocr_results.txt")
+            with open(easyocr_info_file, 'w', encoding='utf-8') as f:
+                f.write("Resultados EasyOCR\n")
+                f.write("="*30 + "\n")
+                for i, (bbox, text, prob) in enumerate(results):
+                    f.write(f"Detecção {i+1}:\n")
+                    f.write(f"  Texto: '{text}'\n")
+                    f.write(f"  Probabilidade: {prob:.3f}\n")
+                    f.write(f"  Bounding Box: {bbox}\n\n")
+                    
+            # Criar imagem com anotações do EasyOCR
+            annotated = roi.copy()
+            for (bbox, text, prob) in results:
+                if prob > 0.3:
+                    pts = np.array(bbox, np.int32)
+                    cv2.polylines(annotated, [pts], True, (0, 255, 0), 2)
+                    cv2.putText(annotated, f"{text} ({prob:.2f})", 
+                               tuple(pts[0]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+            cv2.imwrite(os.path.join(output_dir, f"region_{region_id:02d}_easyocr_annotated.png"), annotated)
+        except Exception as e:
+            print(f"Erro ao salvar resultados do EasyOCR: {e}")
     
     outs = []
     for (bbox, text, prob) in results:
@@ -106,7 +201,8 @@ class BrazilianPlateRecognizer:
     def __init__(self, use_haar: bool = True, target_w: int = 640,
                  max_regions_per_frame: int = 4, ocr_every: int = 6,
                  preset_ultra: bool = False, pool_size: int = None,
-                 ocr_engine: str = 'easyocr', cam_calib_path: str = None):
+                 ocr_engine: str = 'easyocr', cam_calib_path: str = None,
+                 save_preprocessing: bool = False, output_dir: str = "plate_processing"):
         """
         :param use_haar: ativa o Haar Cascade
         :param target_w: largura alvo para processamento
@@ -116,13 +212,23 @@ class BrazilianPlateRecognizer:
         :param pool_size: nº de processos de OCR
         :param ocr_engine: 'tesseract', 'easyocr' ou 'dual'
         :param cam_calib_path: caminho para o arquivo de calibração
+        :param save_preprocessing: salva etapas de pré-processamento
+        :param output_dir: diretório para salvar arquivos de processamento
         """
         self.preset_ultra = preset_ultra
         self.target_w = target_w
         self.max_regions_per_frame = max_regions_per_frame
         self.ocr_every = ocr_every
         self.ocr_engine = ocr_engine
+        self.save_preprocessing = save_preprocessing
+        self.output_dir = output_dir
         self.mtx, self.dist = None, None
+        self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Criar diretório de saída se necessário
+        if self.save_preprocessing:
+            os.makedirs(self.output_dir, exist_ok=True)
+            print(f"📁 Salvando etapas de processamento em: {self.output_dir}")
 
         if cam_calib_path and os.path.exists(cam_calib_path):
             try:
@@ -249,6 +355,90 @@ class BrazilianPlateRecognizer:
             if not dup: unique.append((x1, y1, w1, h1))
         return unique
 
+    def save_detection_stages(self, frame: np.ndarray, regions: List[Tuple[int,int,int,int]], 
+                            detected_plates: List[str], timestamp: str = None) -> str:
+        """
+        Salva as etapas de detecção: frame original, regiões detectadas, etc.
+        Retorna o diretório onde os arquivos foram salvos.
+        """
+        if not self.save_preprocessing:
+            return ""
+            
+        if timestamp is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+            
+        # Criar subdiretório para esta detecção
+        detection_dir = os.path.join(self.output_dir, f"detection_{timestamp}")
+        os.makedirs(detection_dir, exist_ok=True)
+        
+        try:
+            # 1. Salvar frame original
+            cv2.imwrite(os.path.join(detection_dir, "00_original_frame.png"), frame)
+            
+            # 2. Frame com correção de distorção (se aplicável)
+            if self.mtx is not None and self.dist is not None:
+                undistorted = cv2.undistort(frame, self.mtx, self.dist, None)
+                cv2.imwrite(os.path.join(detection_dir, "01_undistorted_frame.png"), undistorted)
+                frame_for_processing = undistorted
+            else:
+                frame_for_processing = frame
+            
+            # 3. Frame redimensionado para processamento
+            proc_frame, scale = self._resize_for_speed(frame_for_processing)
+            cv2.imwrite(os.path.join(detection_dir, "02_resized_for_processing.png"), proc_frame)
+            
+            # 4. Visualização da detecção Haar Cascade
+            if self.plate_cascade is not None:
+                haar_regions = self.detect_plate_regions_haar(proc_frame)
+                haar_vis = proc_frame.copy()
+                for i, (x, y, w, h) in enumerate(haar_regions):
+                    cv2.rectangle(haar_vis, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                    cv2.putText(haar_vis, f"Haar {i+1}", (x, y-5), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+                cv2.imwrite(os.path.join(detection_dir, "03_haar_cascade_detection.png"), haar_vis)
+            
+            # 5. Visualização da detecção por contornos
+            contour_regions = self.detect_plate_regions_contour(proc_frame)
+            contour_vis = proc_frame.copy()
+            for i, (x, y, w, h) in enumerate(contour_regions):
+                cv2.rectangle(contour_vis, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                cv2.putText(contour_vis, f"Contour {i+1}", (x, y-5), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            cv2.imwrite(os.path.join(detection_dir, "04_contour_detection.png"), contour_vis)
+            
+            # 6. Visualização de todas as regiões finais
+            all_regions_vis = proc_frame.copy()
+            for i, (x, y, w, h) in enumerate(regions):
+                cv2.rectangle(all_regions_vis, (x, y), (x+w, y+h), (0, 0, 255), 2)
+                cv2.putText(all_regions_vis, f"Region {i+1}", (x, y-5), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+            cv2.imwrite(os.path.join(detection_dir, "05_final_regions.png"), all_regions_vis)
+            
+            # 7. Salvar informações de detecção
+            info_file = os.path.join(detection_dir, "detection_info.txt")
+            with open(info_file, 'w', encoding='utf-8') as f:
+                f.write(f"Sessão: {self.session_id}\n")
+                f.write(f"Timestamp: {timestamp}\n")
+                f.write(f"Motor OCR: {self.ocr_engine}\n")
+                f.write(f"Preset Ultra: {self.preset_ultra}\n")
+                f.write(f"Frame original: {frame.shape}\n")
+                f.write(f"Frame processado: {proc_frame.shape}\n")
+                f.write(f"Fator de escala: {scale:.3f}\n")
+                f.write(f"Usar Haar Cascade: {self.plate_cascade is not None}\n")
+                f.write(f"Regiões detectadas: {len(regions)}\n")
+                f.write(f"Placas reconhecidas: {detected_plates}\n")
+                f.write("="*50 + "\n")
+                
+                for i, (x, y, w, h) in enumerate(regions):
+                    f.write(f"Região {i+1}: posição=({x},{y}) tamanho={w}x{h} área={w*h}\n")
+            
+            print(f"📁 Etapas de detecção salvas em: {detection_dir}")
+            return detection_dir
+            
+        except Exception as e:
+            print(f"❌ Erro ao salvar etapas de detecção: {e}")
+            return ""
+
     # ---------- Validação ----------
     def validate_and_format_plate(self, text: str) -> Tuple[bool, str]:
         if not text or len(text) < 6: return False, text
@@ -267,6 +457,8 @@ class BrazilianPlateRecognizer:
 
     # ---------- Pipeline por frame (para imagens estáticas) ----------
     def detect_plate_in_frame(self, frame: np.ndarray, debug: bool = False) -> Tuple[List[str], List[Tuple[int,int,int,int]]]:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+        
         if self.mtx is not None and self.dist is not None:
             frame = cv2.undistort(frame, self.mtx, self.dist, None)
         
@@ -279,16 +471,25 @@ class BrazilianPlateRecognizer:
 
         plates = []
         if rois:
+            # Preparar dados para OCR com informações de salvamento
+            output_subdir = os.path.join(self.output_dir, f"detection_{timestamp}") if self.save_preprocessing else ""
+            
             ocr_results = []
             if self.ocr_engine == 'easyocr':
-                jobs = [{"roi": r} for r in rois]
+                jobs = [{"roi": r, "save_preprocessing": self.save_preprocessing, 
+                        "output_dir": output_subdir, "region_id": i} for i, r in enumerate(rois)]
                 ocr_results = self.pool.map(_easyocr_worker, jobs)
             elif self.ocr_engine == 'tesseract':
-                jobs = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants} for r in rois]
+                jobs = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants,
+                        "save_preprocessing": self.save_preprocessing, "output_dir": output_subdir, 
+                        "region_id": i} for i, r in enumerate(rois)]
                 ocr_results = self.pool.map(_tesseract_worker, jobs)
             elif self.ocr_engine == 'dual':
-                jobs_easy = [{"roi": r} for r in rois]
-                jobs_tess = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants} for r in rois]
+                jobs_easy = [{"roi": r, "save_preprocessing": self.save_preprocessing, 
+                             "output_dir": output_subdir, "region_id": i} for i, r in enumerate(rois)]
+                jobs_tess = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants,
+                             "save_preprocessing": self.save_preprocessing, "output_dir": output_subdir, 
+                             "region_id": i} for i, r in enumerate(rois)]
                 res_easy = self.pool.map_async(_easyocr_worker, jobs_easy)
                 res_tess = self.pool.map_async(_tesseract_worker, jobs_tess)
                 ocr_results = res_easy.get() + res_tess.get()
@@ -297,6 +498,10 @@ class BrazilianPlateRecognizer:
             for t in detected_texts:
                 ok, p = self.validate_and_format_plate(t)
                 if ok and p not in plates: plates.append(p)
+
+        # Salvar etapas de detecção se solicitado
+        if self.save_preprocessing:
+            self.save_detection_stages(frame, regions_limited, plates, timestamp)
 
         inv = 1.0 / scale
         boxes = [(int(x*inv), int(y*inv), int(w*inv), int(h*inv)) for (x, y, w, h) in regions_limited]
@@ -350,15 +555,23 @@ class BrazilianPlateRecognizer:
                         last_drawn_boxes = [(int(x*inv_scale), int(y*inv_scale), int(w*inv_scale), int(h*inv_scale)) for (x,y,w,h) in regions_limited]
                         
                         if rois:
+                            output_subdir = os.path.join(self.output_dir, f"live_{self.session_id}_{frame_id:06d}") if self.save_preprocessing else ""
+                            
                             if self.ocr_engine == 'easyocr':
-                                jobs = [{"roi": r} for r in rois]
+                                jobs = [{"roi": r, "save_preprocessing": self.save_preprocessing, 
+                                        "output_dir": output_subdir, "region_id": i} for i, r in enumerate(rois)]
                                 ocr_job_easy = self.pool.map_async(_easyocr_worker, jobs)
                             elif self.ocr_engine == 'tesseract':
-                                jobs = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants} for r in rois]
+                                jobs = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants,
+                                        "save_preprocessing": self.save_preprocessing, "output_dir": output_subdir, 
+                                        "region_id": i} for i, r in enumerate(rois)]
                                 ocr_job_tess = self.pool.map_async(_tesseract_worker, jobs)
                             elif self.ocr_engine == 'dual':
-                                jobs_easy = [{"roi": r} for r in rois]
-                                jobs_tess = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants} for r in rois]
+                                jobs_easy = [{"roi": r, "save_preprocessing": self.save_preprocessing, 
+                                             "output_dir": output_subdir, "region_id": i} for i, r in enumerate(rois)]
+                                jobs_tess = [{"roi": r, "psm_cfgs": self.psm_configs, "mode": self.use_variants,
+                                             "save_preprocessing": self.save_preprocessing, "output_dir": output_subdir, 
+                                             "region_id": i} for i, r in enumerate(rois)]
                                 ocr_job_easy = self.pool.map_async(_easyocr_worker, jobs_easy)
                                 ocr_job_tess = self.pool.map_async(_tesseract_worker, jobs_tess)
                             
@@ -381,6 +594,14 @@ class BrazilianPlateRecognizer:
                                     recent.extend(list(set(plates)))
                                     confirmed_plate = plates[0]
                                     print(f"✅ PLACA CONFIRMADA: {confirmed_plate}")
+                                    
+                                    # Salvar etapas do frame onde a placa foi confirmada
+                                    if self.save_preprocessing:
+                                        self.save_detection_stages(frame, 
+                                                                  [(int(x*inv_scale), int(y*inv_scale), 
+                                                                    int(w*inv_scale), int(h*inv_scale)) 
+                                                                   for (x,y,w,h) in regions_limited], 
+                                                                  plates, f"live_{self.session_id}_{frame_id:06d}")
                                             
                                 if debug: print(f"[live] Job OCR finalizado. Placas: {plates}")
                         except Exception as e:
@@ -496,6 +717,8 @@ def main():
     parser.add_argument('--ocr-engine', type=str, default='easyocr', choices=['tesseract', 'easyocr', 'dual'], help='Motor de OCR a ser usado')
     parser.add_argument('--cam-calib', type=str, default=None, help='Caminho para o arquivo de calibração de câmera (ex: camera_params.npz)')
     parser.add_argument('--calibrate', action='store_true', help='Modo de calibração de câmera. Use com --camera.')
+    parser.add_argument('--save-preprocessing', action='store_true', help='Salvar todas as etapas de pré-processamento')
+    parser.add_argument('--output-dir', type=str, default='plate_processing', help='Diretório para salvar arquivos de processamento')
     parser.add_argument('image_path', nargs='?', help='Caminho da imagem (modo estático)')
     args = parser.parse_args()
 
@@ -518,7 +741,9 @@ def main():
         target_w=576 if args.ultra else 640,
         max_regions_per_frame=3 if args.ultra else 4,
         ocr_every=8 if args.ultra else 6,
-        preset_ultra=args.ultra
+        preset_ultra=args.ultra,
+        save_preprocessing=args.save_preprocessing,
+        output_dir=args.output_dir
     )
     recognizer = BrazilianPlateRecognizer(use_haar=not args.no_haar, pool_size=args.pool_size, ocr_engine=args.ocr_engine, cam_calib_path=args.cam_calib, **params)
 
@@ -531,6 +756,8 @@ def main():
         else:
             plates, _ = recognizer.detect_plate_in_frame(img, debug=args.debug)
             print("🎯 Placas detectadas:", plates if plates else "Nenhuma")
+            if args.save_preprocessing and plates:
+                print(f"📁 Arquivos de processamento salvos em: {args.output_dir}")
     else:
         parser.print_help()
     
