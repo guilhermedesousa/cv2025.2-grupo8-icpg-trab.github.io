@@ -1,318 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etapa 3 - Seminário S1 - Grupo 8 - ICPG</title>
+    <title>Etapa 3 | Seminário S1 dos Trabalhos - Grupo 8 - ICPG</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #111827;
-            --accent: #e11d48;
-            --bg: #f5f6fa;
-            --white: #fff;
-            --gray: #6b7280;
-            --border: #e5e7eb;
-            --radius: 8px;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --transition: 0.2s;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            background: var(--bg);
-            color: var(--secondary);
-            font-family: 'Roboto', sans-serif;
-            font-size: 17px;
-            line-height: 1.6;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .nav-container {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 60px;
-            padding: 0 18px;
-        }
-
-        .nav-title {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.2rem;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 18px;
-            list-style: none;
-            margin: 0;
-        }
-
-        .nav-links a {
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 400;
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: background var(--transition), color var(--transition);
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .nav-toggle {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-        }
-
-        .nav-toggle .bar {
-            height: 2px;
-            width: 100%;
-            background: var(--primary);
-            border-radius: 2px;
-            transition: var(--transition);
-        }
-
-        header {
-            text-align: center;
-            padding: 38px 0 18px;
-        }
-
-        header h1 {
-            font-size: 2.1rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        header p {
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-
-        main.container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 36px 24px 24px 24px;
-            margin-bottom: 32px;
-            margin-top: 24px;
-            flex-grow: 1;
-        }
-
-        section {
-            margin-bottom: 36px;
-        }
-
-        h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 18px;
-            letter-spacing: 0.2px;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 12px;
-        }
-
-        ul {
-            list-style-position: inside;
-            padding-left: 0;
-            margin-bottom: 16px;
-        }
-
-        li {
-            margin-bottom: 7px;
-        }
-
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: color var(--transition);
-        }
-
-        a:hover {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-
-        .info-box {
-            background: #f3f4f6;
-            padding: 14px 18px;
-            border-radius: var(--radius);
-            font-size: 0.98em;
-            color: var(--gray);
-            margin-bottom: 24px;
-        }
-
-        .info-box p {
-            margin: 0;
-        }
-
-        .content-section {
-            padding-bottom: 0;
-        }
-
-        .rodape {
-            text-align: center;
-            padding: 24px 0 18px 0;
-            color: white;
-            font-size: 0.98em;
-            border-top: 1px solid var(--border);
-            background: #00420c;
-            margin-top: auto;
-        }
-
-        @media (max-width: 700px) {
-
-            .nav-container,
-            main.container {
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-
-            main.container {
-                padding: 18px 12px 12px 12px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .nav-toggle {
-                display: flex;
-            }
-
-            .nav-links {
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background: var(--white);
-                flex-direction: column;
-                width: 100%;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .nav-links.open {
-                max-height: 220px;
-            }
-
-            .nav-links li {
-                width: 100%;
-            }
-
-            .nav-links li a {
-                display: block;
-                width: 100%;
-                padding: 12px 18px;
-                border-bottom: 1px solid #f3f4f6;
-            }
-        }
+        :root { --primary: #2563eb; --secondary: #111827; --accent: #e11d48; --bg: #f5f6fa; --white: #fff; --gray: #6b7280; --border: #e5e7eb; --radius: 8px; --shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --transition: 0.2s; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { background: var(--bg); color: var(--secondary); font-family: 'Roboto', sans-serif; font-size: 17px; line-height: 1.6; min-height: 100vh; }
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main.container { max-width: 700px; margin: 0 auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 24px 24px 24px; margin-bottom: 32px; margin-top: 24px; }
+        h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); margin-bottom: 18px; letter-spacing: 0.2px; }
+        ul.links { list-style: none; padding: 0; margin: 0; }
+        ul.links li { margin-bottom: 18px; }
+        a.link-etapa { display: block; background: var(--primary); color: var(--white); text-decoration: none; padding: 18px 20px; border-radius: var(--radius); font-size: 1.1rem; font-weight: 500; box-shadow: var(--shadow); transition: background 0.2s, color 0.2s, transform 0.2s; }
+        a.link-etapa:hover { background: var(--accent); color: var(--white); transform: translateY(-2px) scale(1.03); }
+        .desc { color: var(--gray); font-size: 1rem; margin-bottom: 24px; }
+        footer.rodape { text-align: center; padding: 24px 0 18px 0; color: var(--gray); font-size: 0.98em; border-top: 1px solid var(--border); background: var(--white); margin-top: auto; }
+        @media (max-width: 700px) { main.container { padding-left: 8px; padding-right: 8px; } h2 { font-size: 1.1rem; } a.link-etapa { font-size: 1rem; padding: 14px 10px; } }
     </style>
 </head>
-
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <span class="nav-title">Grupo 8 - ICPG</span>
-            <button class="nav-toggle" aria-label="Abrir menu"
-                onclick="document.querySelector('.nav-links').classList.toggle('open')">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-            <ul class="nav-links">
-                <li><a href="../../index.html">Início</a></li>
-                <li><a href="../index.html">Trabalho</a></li>
-            </ul>
-        </div>
-    </nav>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.nav-links a').forEach(function (link) {
-                link.addEventListener('click', function () {
-                    document.querySelector('.nav-links').classList.remove('open');
-                });
-            });
-        });
-    </script>
-    <header>
-        <h1>Etapa 3 - Seminário S1 dos Trabalhos</h1>
-        <p>Apresentação do andamento do projeto</p>
-    </header>
-    <main class="container">
-        <section class="content-section">
-            <div class="info-box">
-                <p><strong>Data de Realização:</strong> 01/07/2025</p>
-                <p><strong>Data de Publicação:</strong> 07/07/2025</p>
-            </div>
-            <div>
-                <h2>Integrantes</h2>
-                <ul>
-                    <li>Ian Victor Toniolo Silva - RA: 11202020351</li>
-                    <li>Cesar Seiji Maruyama - RA: 11127015</li>
-                    <li>Pedro Henrique Cardoso Silva - RA: 11202021250</li>
-                    <li>Guilherme de Sousa Santos - RA: 11201921175</li>
-                </ul>
-            </div>
-            <div>
-                <h2>Etapas Apresentadas</h2>
-                <ul>
-                    <li><a href="../etapa_0/index.html">Etapa 0 - Entrevista Empática</a></li>
-                    <li><a href="../etapa_1/index.html">Etapa 1 - Contexto e Cenário de Aplicação (CA)</a></li>
-                    <li><a href="../etapa_2/index.html">Etapa 2 - Modelagem Funcional do Sistema</a></li>
-                </ul>
-            </div>
-        </section>
-    </main>
-    <footer class="rodape">
-        &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
-        <img src="https://www.ufabc.edu.br/images/conteudo/logo2.png" alt="UFABC Logo" height="32"
-            style="margin-top:10px;">
-    </footer>
+<main class="container">
+    <h2>Etapa 3: Seminário S1 dos Trabalhos</h2>
+    <p class="desc">Abaixo, acesse rapidamente as etapas anteriores do projeto:</p>
+    <ul class="links">
+        <li><a class="link-etapa" href="../etapa_0/index.html">Etapa 0 - Entrevista Empática</a></li>
+        <li><a class="link-etapa" href="../etapa_1/index.html">Etapa 1 - Contexto e Cenário de Aplicação (CA)</a></li>
+        <li><a class="link-etapa" href="../etapa_2/index.html">Etapa 2 - Modelagem Funcional do Sistema</a></li>
+    </ul>
+</main>
+<footer class="rodape">
+    &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
+    <img src="https://www.ufabc.edu.br/images/identidade-visual/ufabc-logo-horizontal-cor.png" alt="UFABC Logo" height="32" style="margin-top:10px;">
+</footer>
 </body>
-
 </html>

@@ -1,1 +1,112 @@
-<html></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etapa 8 | Seminário Final - Grupo 8 - ICPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary: #2563eb; --secondary: #111827; --accent: #e11d48; --bg: #f5f6fa; --white: #fff; --gray: #6b7280; --border: #e5e7eb; --radius: 8px; --shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --transition: 0.2s; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--secondary); font-family: 'Roboto', sans-serif; font-size: 17px; line-height: 1.6; min-height: 100vh; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main.container { max-width: 900px; margin: 0 auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 24px 24px 24px; margin-bottom: 32px; margin-top: 24px; }
+    section { margin-bottom: 36px; }
+    h1 { font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 18px; letter-spacing: 0.2px; text-align: center; }
+    h2 { font-size: 1.3rem; font-weight: 600; color: var(--primary); margin-bottom: 12px; letter-spacing: 0.2px; }
+    h3 { font-size: 1.1rem; font-weight: 500; color: var(--secondary); margin-bottom: 8px; }
+    ul, ol { margin-left: 18px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    .slide { background: #f3f4f6; padding: 18px 14px; border-radius: var(--radius); margin-bottom: 24px; box-shadow: var(--shadow); }
+    .video-container { text-align: center; margin: 24px 0; }
+    video { max-width: 100%; border-radius: 10px; box-shadow: var(--shadow); }
+    .muted { color: var(--gray); }
+    .logo { display: block; margin: 0 auto 18px auto; }
+    @media (max-width: 700px) { main.container { padding-left: 8px; padding-right: 8px; } h1 { font-size: 1.3rem; } h2 { font-size: 1.05rem; } .slide { padding: 12px 7px; } }
+  </style>
+</head>
+<body>
+<main class="container">
+  <img class="logo" src="https://www.ufabc.edu.br/images/identidade-visual/ufabc-logo-horizontal-cor.png" alt="UFABC Logo" height="38">
+  <h1>Seminário Final — Sistema de Leitura Automática de Placas de Veículos<br>Grupo 8 - ICPG</h1>
+
+  <section class="slide">
+    <h2>1. Motivação e Contexto</h2>
+    <ul>
+      <li>Problemas reais identificados em entrevistas: registro manual de placas, erros humanos, necessidade de automação em estacionamentos e obras.</li>
+      <li>Visão computacional como solução prática e inovadora para demandas do cotidiano.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>2. Objetivos do Projeto</h2>
+    <ul>
+      <li>Desenvolver um sistema capaz de detectar e ler automaticamente placas de veículos usando Python e OpenCV.</li>
+      <li>Aplicar conceitos fundamentais de visão computacional: filtragem, transformações, calibração, OCR, etc.</li>
+      <li>Facilitar o uso por usuários leigos, com interface simples e resultados claros.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>3. Metodologia</h2>
+    <ul>
+      <li>Levantamento de requisitos via entrevistas empáticas (Etapa 0).</li>
+      <li>Definição do cenário e modelagem funcional (Etapas 1 e 2).</li>
+      <li>Implementação do sistema em Python, com OpenCV, pytesseract e easyocr.</li>
+      <li>Testes experimentais em laboratório e campo, com coleta de feedback de usuários.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>4. Funcionamento do Sistema</h2>
+    <ul>
+      <li>Captura de vídeo em tempo real via webcam.</li>
+      <li>Pré-processamento das imagens: redimensionamento, escala de cinza, redução de ruído.</li>
+      <li>Detecção de regiões de placa usando Haar Cascade e contornos.</li>
+      <li>Reconhecimento de caracteres (OCR) com motores Tesseract e EasyOCR.</li>
+      <li>Exibição dos resultados na tela e registro das placas detectadas.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>5. Resultados e Avaliação</h2>
+    <ul>
+      <li>O sistema foi testado com diferentes usuários e condições de iluminação.</li>
+      <li>Taxa de acerto satisfatória em placas padrão Mercosul e boa resposta em tempo real.</li>
+      <li>Feedback positivo dos usuários quanto à facilidade de uso e utilidade prática.</li>
+      <li>Limitações: sensibilidade a ângulos extremos e iluminação muito baixa.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>6. Conclusões</h2>
+    <ul>
+      <li>O projeto atingiu os objetivos propostos, integrando teoria e prática de visão computacional.</li>
+      <li>O sistema é aplicável em cenários reais e pode ser expandido para outras aplicações.</li>
+      <li>Aprendizado significativo em processamento de imagens, OCR e desenvolvimento experimental.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>7. Demonstração em Vídeo</h2>
+    <div class="video-container">
+      <video controls src="../etapa_7/video-apresentacao.mp4" poster="../etapa_2/block-diagram-license-plate.png">
+        Seu navegador não suporta a tag de vídeo.
+      </video>
+      <p class="muted">Demonstração do sistema SPV em funcionamento durante o Teste de Campo.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>8. Agradecimentos e Perguntas</h2>
+    <ul>
+      <li>Agradecemos à UFABC, ao professor e aos participantes das entrevistas e testes.</li>
+      <li>Estamos abertos para perguntas e discussões!</li>
+    </ul>
+  </section>
+</main>
+<footer class="rodape" style="text-align:center; color:#6b7280; font-size:0.98em; border-top:1px solid #e5e7eb; background:#fff; margin-top:auto; padding:24px 0 18px 0;">
+  &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
+</footer>
+</body>
+</html>

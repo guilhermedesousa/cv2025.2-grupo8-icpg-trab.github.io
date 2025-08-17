@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etapa 7 | Relatório Final do Trabalho (RFT) - Grupo 8 - ICPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary: #2563eb; --secondary: #111827; --accent: #e11d48; --bg: #f5f6fa; --white: #fff; --gray: #6b7280; --border: #e5e7eb; --radius: 8px; --shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --transition: 0.2s; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--secondary); font-family: 'Roboto', sans-serif; font-size: 17px; line-height: 1.6; min-height: 100vh; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main.container { max-width: 900px; margin: 0 auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 24px 24px 24px; margin-bottom: 32px; margin-top: 24px; }
+    section { margin-bottom: 36px; }
+    h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); margin-bottom: 18px; letter-spacing: 0.2px; }
+    h3 { font-size: 1.1rem; font-weight: 500; color: var(--secondary); margin-bottom: 12px; }
+    h4 { font-size: 1rem; font-weight: 500; color: var(--primary); margin-bottom: 8px; }
+    ul, ol { margin-left: 18px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    .section { background: #f3f4f6; padding: 18px 14px; border-radius: var(--radius); margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+    th, td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--primary); color: var(--white); }
+    tr:nth-child(even) { background: #f9fafb; }
+    tr:nth-child(odd) { background: #f3f4f6; }
+    code, pre { background: #f9fafb; border-radius: 6px; padding: 2px 6px; font-size: 0.98em; }
+    .muted { color: var(--gray); }
+    .video-container { text-align: center; margin: 24px 0; }
+    video { max-width: 100%; border-radius: 10px; box-shadow: var(--shadow); }
+    footer.rodape { text-align: center; padding: 24px 0 18px 0; color: var(--gray); font-size: 0.98em; border-top: 1px solid var(--border); background: var(--white); margin-top: auto; }
+    @media (max-width: 700px) { main.container { padding-left: 8px; padding-right: 8px; } h2 { font-size: 1.1rem; } h3 { font-size: 1rem; } .section { padding: 12px 7px; } }
+  </style>
+</head>
+<body>
+<main class="container">
+  <section>
+    <h2>Relatório Final do Trabalho (RFT) — Etapa 7</h2>
+    <p class="muted">Grupo 8 - ICPG | Visão Computacional - UFABC</p>
+  </section>
+
+  <section class="section">
+    <h3>Introdução</h3>
+    <ul>
+      <li><b>Objetivo:</b> Desenvolver um sistema de visão computacional para leitura automática de placas de veículos, aplicando conceitos fundamentais da disciplina.</li>
+      <li><b>Cenário de Aplicação (CA):</b> Automatização do registro de placas em estacionamentos e canteiros de obras, reduzindo erros humanos e otimizando processos.</li>
+      <li><b>Fundamentação teórica:</b> O projeto utiliza técnicas de processamento digital de imagens, detecção de regiões de interesse, transformações geométricas, calibração de câmera, OCR e validação de padrões de placas brasileiras.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Materiais e Métodos</h3>
+    <ul>
+      <li><b>Modelagem Funcional do SPV (MF):</b> <a href="../etapa_2/index.html">Ver Etapa 2</a></li>
+      <li><b>Descrição da implementação:</b> O sistema foi implementado em Python, utilizando OpenCV, pytesseract e easyocr. O código principal está em <code>plates_recognizer.py</code>.</li>
+      <li><b>Lista dos arquivos:</b>
+        <ul>
+          <li><code>plates_recognizer.py</code> (código principal)</li>
+          <li><code>haarcascade_russian_plate_number.xml</code> (classificador Haar Cascade)</li>
+          <li><code>requirements.txt</code> (dependências)</li>
+          <li><code>gerador_placa.html</code> (gerador de placas de teste)</li>
+          <li>Imagens, vídeos e arquivos auxiliares na pasta <code>projeto/</code></li>
+        </ul>
+      </li>
+      <li><b>Análise técnica:</b> O sistema atendeu ao contexto proposto, realizando detecção e leitura de placas em tempo real, com métricas qualitativas (acerto visual, facilidade de uso) e quantitativas (tempo de resposta, taxa de acerto em amostras).</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Laboratório Experimental</h3>
+    <ul>
+      <li><b>Roteiro do Laboratório Experimental:</b> <a href="../etapa_5/index.html">Ver Etapa 5</a></li>
+      <li><b>Análise dos Resultados do Teste de Campo (TCS):</b> <a href="../etapa_6/index.html">Ver Etapa 6</a></li>
+      <li>Os experimentos foram realizados com diferentes usuários, em condições reais de iluminação e posicionamento, e os resultados foram registrados e avaliados conforme o roteiro.</li>
+      <li>As médias das avaliações e opiniões subjetivas dos usuários estão documentadas nos formulários e planilhas anexas.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Conclusões</h3>
+    <ul>
+      <li>Os objetivos propostos foram atingidos, com o sistema funcionando de acordo com a modelagem e o contexto definidos.</li>
+      <li>Pontos positivos: automação eficiente, interface amigável, fácil adaptação a diferentes ambientes.</li>
+      <li>Pontos a melhorar: sensibilidade a condições extremas de iluminação e ângulos muito inclinados.</li>
+      <li>O projeto proporcionou aprendizado prático dos conceitos de visão computacional.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Referências Bibliográficas</h3>
+    <ul>
+      <li>GONZALEZ, R. C.; WOODS, R. E. Processamento Digital de Imagens. 4ª ed. Pearson, 2018.</li>
+      <li>OpenCV Documentation. <a href="https://docs.opencv.org/">https://docs.opencv.org/</a></li>
+      <li>Pytesseract Documentation. <a href="https://pypi.org/project/pytesseract/">https://pypi.org/project/pytesseract/</a></li>
+      <li>EasyOCR Documentation. <a href="https://www.jaided.ai/easyocr/">https://www.jaided.ai/easyocr/</a></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Anexos</h3>
+    <ul>
+      <li>Todos os códigos-fonte, imagens, vídeos e arquivos auxiliares estão disponíveis na pasta <code>projeto/</code> deste repositório.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Apresentação em Vídeo</h3>
+    <div class="video-container">
+      <video controls src="video-apresentacao.mp4" poster="../etapa_2/block-diagram-license-plate.png">
+        Seu navegador não suporta a tag de vídeo.
+      </video>
+      <p class="muted">Demonstração do sistema SPV em funcionamento durante o Teste de Campo.</p>
+    </div>
+  </section>
+</main>
+<footer class="rodape">
+  &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
+  <img src="https://www.ufabc.edu.br/images/identidade-visual/ufabc-logo-horizontal-cor.png" alt="UFABC Logo" height="32" style="margin-top:10px;">
+</footer>
+</body>
+</html>
