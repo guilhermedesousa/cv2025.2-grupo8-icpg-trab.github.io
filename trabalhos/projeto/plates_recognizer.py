@@ -139,8 +139,8 @@ class BrazilianPlateRecognizer:
             try:
                 import easyocr
             except ImportError:
-                print("❌ EasyOCR não encontrado! Instale com: pip install easyocr")
-                sys.exit(1)
+                print("❌ EasyOCR não encontrado! Instale com: pip install easyocr, não será possível usa-lo ou modo dual.")
+
 
         if use_haar:
             self.load_haar_cascade()

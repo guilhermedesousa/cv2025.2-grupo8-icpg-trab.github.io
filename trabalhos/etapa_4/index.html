@@ -1,1 +1,358 @@
-<html></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etapa 4 - Desenvolvimento do SPV - Grupo 8 - ICPG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #111827;
+            --accent: #e11d48;
+            --bg: #f5f6fa;
+            --white: #fff;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --radius: 8px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --transition: 0.2s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--secondary);
+            font-family: 'Roboto', sans-serif;
+            font-size: 17px;
+            line-height: 1.6;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            padding: 0 18px;
+        }
+
+        .nav-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 400;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-toggle .bar {
+            height: 2px;
+            width: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        header {
+            text-align: center;
+            padding: 38px 0 18px;
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        main.container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 36px 24px 24px 24px;
+            margin-bottom: 32px;
+            margin-top: 24px;
+            flex-grow: 1;
+        }
+
+        section {
+            margin-bottom: 36px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 18px;
+            letter-spacing: 0.2px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+
+        ul {
+            list-style-position: inside;
+            padding-left: 0;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 7px;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #f3f4f6;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            font-size: 0.98em;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+
+        .info-box p {
+            margin: 0;
+        }
+
+        .content-section {
+            padding-bottom: 0;
+        }
+
+        .rodape {
+            text-align: center;
+            padding: 24px 0 18px 0;
+            color: white;
+            font-size: 0.98em;
+            border-top: 1px solid var(--border);
+            background: #00420c;
+            margin-top: auto;
+        }
+
+        code {
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        @media (max-width: 700px) {
+
+            .nav-container,
+            main.container {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            main.container {
+                padding: 18px 12px 12px 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.open {
+                max-height: 220px;
+            }
+
+            .nav-links li {
+                width: 100%;
+            }
+
+            .nav-links li a {
+                display: block;
+                width: 100%;
+                padding: 12px 18px;
+                border-bottom: 1px solid #f3f4f6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="nav-title">Grupo 8 - ICPG</span>
+            <button class="nav-toggle" aria-label="Abrir menu"
+                onclick="document.querySelector('.nav-links').classList.toggle('open')">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="../../index.html">Início</a></li>
+                <li><a href="../index.html">Trabalho</a></li>
+            </ul>
+        </div>
+    </nav>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.nav-links a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    document.querySelector('.nav-links').classList.remove('open');
+                });
+            });
+        });
+    </script>
+    <header>
+        <h1>Etapa 4 – Desenvolvimento do Sistema de Processamento Visual (SPV)</h1>
+        <p>Implementação e detalhes técnicos do reconhecedor de placas</p>
+    </header>
+    <main class="container">
+        <section class="content-section">
+            <div class="info-box">
+                <p><strong>Data de Realização:</strong> 23/07/2025</p>
+                <p><strong>Data de Publicação:</strong> 30/07/2025</p>
+            </div>
+            <div>
+                <h2>Integrantes</h2>
+                <ul>
+                    <li>Ian Victor Toniolo Silva - RA: 11202020351</li>
+                    <li>Cesar Seiji Maruyama - RA: 11127015</li>
+                    <li>Pedro Henrique Cardoso Silva - RA: 11202021250</li>
+                    <li>Guilherme de Sousa Santos - RA: 11201921175</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Resumo</h2>
+                <p>Nessa etapa, evoluímos a ideia e implementamos a primeira versão funcional do nosso Sistema de Processamento Visual (SPV) para reconhecimento de placas de veículos brasileiros no padrão Mercosul. O SPV foi desenvolvido utilizando Python e a biblioteca OpenCV, com foco na detecção e leitura de placas em imagens estáticas e vídeo em tempo real.</p>
+            </div>
+            <div>
+                <h2>Tecnologias Utilizadas</h2>
+                <p>O núcleo do sistema foi construído com <strong>Python</strong>, utilizando as seguintes bibliotecas principais:</p>
+                <ul>
+                    <li><strong>OpenCV (cv2):</strong> Para todas as operações de processamento de imagem, como detecção de bordas, transformações e manipulação de vídeo.</li>
+                    <li><strong>Pytesseract e EasyOCR:</strong> Motores de Reconhecimento Óptico de Caracteres (OCR) para extrair o texto das placas detectadas. O sistema permite escolher entre eles ou usar ambos em paralelo.</li>
+                    <li><strong>NumPy:</strong> Para manipulação eficiente de arrays e matrizes, fundamental em processamento de imagem.</li>
+                    <li><strong>Multiprocessing:</strong> Para executar o OCR em processos separados, evitando que a interface de vídeo em tempo real trave durante a análise.</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Implementação Explicada</h2>
+                <p>O pipeline do nosso SPV, implementado no script <code>plates_recognizer.py</code>, segue uma sequência lógica de passos para identificar e ler uma placa:</p>
+                <ol>
+                    <li><strong>Entrada e Pré-processamento:</strong> O sistema aceita como entrada uma imagem estática ou um fluxo de vídeo da webcam. Cada quadro é redimensionado para uma largura padrão (ex: 640 pixels) para otimizar a performance. Se um arquivo de calibração de câmera for fornecido, a distorção da lente é corrigida.</li>
+                    <li><strong>Detecção de Regiões de Interesse (ROI):</strong> Para localizar as placas, utilizamos uma abordagem híbrida:
+                        <ul>
+                            <li><strong>Haar Cascade:</strong> Um classificador pré-treinado (<code>haarcascade_russian_plate_number.xml</code>) realiza uma busca rápida por objetos com características de placas.</li>
+                            <li><strong>Detecção de Contornos:</strong> Em paralelo, o sistema converte a imagem para escala de cinza, aplica um filtro de Canny para detectar bordas e procura por contornos retangulares que correspondam à proporção de uma placa veicular (aproximadamente 4:1).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Filtragem e Seleção de ROIs:</strong> As regiões encontradas pelos dois métodos são combinadas, e as duplicatas são removidas para evitar processamento redundante. As ROIs mais promissoras são selecionadas para a próxima etapa.</li>
+                    <li><strong>Reconhecimento Óptico de Caracteres (OCR):</strong> Cada ROI selecionada é enviada para um processo de OCR assíncrono. Para melhorar a acurácia, aplicamos diferentes pré-tratamentos na ROI (equalização de histograma, limiarização adaptativa) antes de passá-la para o motor (Tesseract ou EasyOCR).</li>
+                    <li><strong>Pós-processamento e Validação:</strong> O texto extraído pelo OCR é "limpo", removendo caracteres não alfanuméricos. Em seguida, ele é validado contra o padrão de placas Mercosul (LLLNLNN). O sistema também realiza substituições comuns (ex: 'O' por '0', 'I' por '1') para corrigir erros frequentes do OCR.</li>
+                    <li><strong>Exibição do Resultado:</strong> Em modo de vídeo, a placa validada é exibida na tela, com um retângulo desenhado ao redor da região detectada. Para evitar oscilações, uma placa só é considerada "confirmada" após ser detectada consistentemente em vários quadros consecutivos.</li>
+                </ol>
+            </div>
+            <div>
+                <h2>Testes e Validação</h2>
+                <p>Para facilitar a validação do sistema em diferentes condições de iluminação e ângulos, desenvolvemos uma ferramenta auxiliar: um gerador de placas customizadas em HTML. Isso nos permitiu testar o reconhecimento usando a câmera do celular, exibindo placas com textos variados diretamente na tela.</p>
+                <p><a href="../projeto/gerador_placa.html">Acessar o Gerador de Placas</a></p>
+            </div>
+            <div>
+                <h2>Regulamento do Trabalho</h2>
+                <p>O desenvolvimento seguiu as exigências do trabalho, incluindo a implementação de um modo de calibração de câmera, o uso de bibliotecas de visão computacional e a estruturação do código de forma modular e comentada.</p>
+            </div>
+        </section>
+    </main>
+    <footer class="rodape">
+        &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
+        <img src="https://www.ufabc.edu.br/images/conteudo/logo2.png" alt="UFABC Logo" height="32"
+            style="margin-top:10px;">
+    </footer>
+</body>
+
+</html>

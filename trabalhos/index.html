@@ -6,12 +6,116 @@
     <title>Índice de Relatórios - Grupo 8 - ICPG</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #111827;
+            --accent: #e11d48;
+            --bg: #f5f6fa;
+            --white: #fff;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --radius: 8px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --transition: 0.2s;
+        }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .nav-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 400;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-toggle .bar {
+            height: 2px;
+            width: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            padding: 0 18px;
+        }
+
+        header {
+            text-align: center;
+            padding: 38px 0 18px;
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f5f6fa;
             color: #111827;
-            margin: 0;
-            padding: 20px;
+            margin: 0;        
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         h1 {
             text-align: center;
@@ -20,6 +124,7 @@
         ul {
             list-style-type: none;
             padding: 0;
+            text-align: center;
         }
         li {
             margin: 10px 0;
@@ -37,27 +142,53 @@
             margin-top: 20px;
             color: #6b7280;
         }
+        .rodape {
+            text-align: center;
+            padding: 24px 0 18px 0;
+            color: white;
+            font-size: 0.98em;
+            border-top: 1px solid var(--border);
+            background: #00420c;
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="nav-title">Grupo 8 - ICPG</span>
+            <button class="nav-toggle" aria-label="Abrir menu"
+                onclick="document.querySelector('.nav-links').classList.toggle('open')">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="#">Trabalho</a></li>
+            </ul>
+        </div>
+    </nav>
     <h1>Índice das etapas do trabalho</h1>
     <p>Bem-vindo ao índice das etapas do trabalho do Grupo 8 - ICPG. Aqui você encontrará uma lista dos relatórios desenvolvidos ao longo do curso de Visão Computacional.</p>
     <ul>
-        <li><a href="etapa_0/index.html">Etapa 0</a></li>
-        <li><a href="etapa_1/index.html">Etapa 1</a></li>
-        <li><a href="etapa_2/index.html">Etapa 2</a></li>
-        <li><a href="etapa_3/index.html">Etapa 3</a></li>
-        <li><a href="etapa_4/index.html">Etapa 4</a></li>
-        <li><a href="etapa_5/index.html">Etapa 5</a></li>
-        <li><a href="etapa_6/index.html">Etapa 6</a></li>
-        <li><a href="etapa_7/index.html">Etapa 7</a></li>
-        <li><a href="etapa_8/index.html">Etapa 8</a></li>
+        <li><a href="etapa_0/index.html">Etapa 0 - Entrevista Empática</a></li>
+        <li><a href="etapa_1/index.html">Etapa 1 - Contexto e Cenário de Aplicação (CA)</a></li>
+        <li><a href="etapa_2/index.html">Etapa 2 - Modelagem Funcional do Sistema</a></li>
+        <li><a href="etapa_3/index.html">Etapa 3 - Seminário S1 dos trabalhos</a></li>
+        <li><a href="etapa_4/index.html">Etapa 4 - Desenvolvimento Sistema de Processamento Visual (SPV)</a></li>
+        <li><a href="etapa_5/index.html">Etapa 5 - Desenvolvimento do Laboratório Experimental</a></li>
+        <li><a href="etapa_6/index.html">Etapa 6 - Teste de Campo do SPV</a></li>
+        <li><a href="etapa_7/index.html">Etapa 7 - Relatório Final do trabalho (RFT)</a></li>
+        <li><a href="etapa_8/index.html">Etapa 8 - Seminário S2 dos Trabalhos</a></li>
     </ul>
 
     <br/>
-    <a href="projeto/gerador_placa.html">Gerador de placa</a>
-    <footer>
-        &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC
+    
+    <footer class="rodape">
+        &copy; 2025 Grupo 8 - ICPG | Visão Computacional - UFABC<br>
+        <img src="https://www.ufabc.edu.br/images/conteudo/logo2.png" alt="UFABC Logo"
+            height="32" style="margin-top:10px;">
     </footer>
 </body>
 </html>
