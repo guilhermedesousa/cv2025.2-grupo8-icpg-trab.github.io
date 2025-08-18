@@ -21,7 +21,7 @@ Atalhos na janela:
 
 Discentes:
 - Ian Victor Toniolo Silva - 11202020351
-- Pedro Henrique Cardoso Silva - 1120202127
+- Pedro Henrique Cardoso Silva - 11202021250
 - Guilherme de Sousa Santos - 11201921175
   
 """
