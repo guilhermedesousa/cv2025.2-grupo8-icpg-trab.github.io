@@ -37,6 +37,31 @@
         margin-top: auto;
     }
     @media (max-width: 700px) { main.container { padding-left: 8px; padding-right: 8px; } h2 { font-size: 1.1rem; } h3 { font-size: 1rem; } .section { padding: 12px 7px; } }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .image-gallery figure {
+            margin: 0;
+            text-align: center;
+            width: calc(33% - 10px);
+        }
+
+        .image-gallery img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .image-gallery figcaption {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: var(--gray);
+        }
   </style>
 </head>
 <body>
@@ -46,13 +71,34 @@
     <p class="muted">Grupo 8 - ICPG | Visão Computacional - UFABC</p>
   </section>
 
-  <section class="section">
+    <section class="section">
     <h3>Introdução</h3>
     <ul>
       <li><b>Objetivo:</b> Desenvolver um sistema de visão computacional para leitura automática de placas de veículos, aplicando conceitos fundamentais da disciplina.</li>
-      <li><b>Cenário de Aplicação (CA):</b> Automatização do registro de placas em estacionamentos e canteiros de obras, reduzindo erros humanos e otimizando processos.</li>
-      <li><b>Fundamentação teórica:</b> O projeto utiliza técnicas de processamento digital de imagens, detecção de regiões de interesse, transformações geométricas, calibração de câmera, OCR e validação de padrões de placas brasileiras.</li>
+      <li><b>Cenário de Aplicação (CA):</b> Automatização do registro de placas em estacionamentos e canteiros de obras, reduzindo erros humanos e otimizando processos.</li>    
     </ul>
+  </section>
+
+  <section class="section">
+    <h3>Fundamentação Teórica</h3>
+    <p>O projeto se baseia em conceitos fundamentais da visão computacional para processar e interpretar as imagens capturadas.</p>
+    
+    <h4>Calibragem de Câmera</h4>
+    <p>A calibração de câmera é um passo crucial para corrigir as distorções geométricas introduzidas pela lente. O nosso sistema inclui um módulo de calibração que, a partir de imagens de um padrão de xadrez, calcula a matriz intrínseca da câmera (distância focal, centro óptico) e os coeficientes de distorção. Com esses parâmetros, o SPV pode "desentortar" as imagens antes do processamento, garantindo que as linhas retas no mundo real apareçam retas na imagem, o que melhora significativamente a precisão na detecção dos contornos da placa.</p>
+
+    <h4>Filtragem e Detecção de Bordas</h4>
+    <p>O pré-processamento das imagens é essencial para destacar as características de interesse. Utilizamos a conversão para escala de cinza para simplificar a informação de cor e o Filtro Gaussiano para suavizar a imagem e remover ruídos de alta frequência. Em seguida, o algoritmo de Canny é aplicado para detectar as bordas (edges), que são as transições abruptas de intensidade. Este passo é fundamental para a detecção de contornos, pois as bordas da placa se tornam proeminentes.</p>
+
+    <h4>Detecção de Contornos e Formas Geométricas</h4>
+    <p>Após a detecção de bordas, o sistema busca por contornos fechados na imagem. Cada contorno é aproximado por uma forma poligonal. Filtramos esses contornos para encontrar aqueles que são retangulares e que possuem uma proporção (largura/altura) compatível com a de uma placa veicular (aproximadamente 4:1). Esta abordagem geométrica é uma das principais estratégias do nosso SPV para localizar as Regiões de Interesse (ROIs).</p>
+
+    <h4>Reconhecimento Óptico de Caracteres (OCR)</h4>
+    <p>Uma vez que uma ROI é isolada, ela é enviada para um motor de OCR. Nosso sistema suporta dois dos mais populares motores de código aberto:</p>
+    <ul>
+      <li><b>Tesseract:</b> Desenvolvido pela HP e mantido pelo Google, é um motor de OCR robusto que analisa o layout do texto e reconhece caracteres individualmente usando redes neurais (LSTM). Ele é altamente configurável, permitindo ajustar modos de segmentação de página (PSMs) para otimizar a leitura em diferentes contextos.</li>
+      <li><b>EasyOCR:</b> Uma biblioteca mais recente e de fácil uso, baseada em PyTorch. Ela utiliza um modelo CRNN (Rede Neural Convolucional-Recorrente) que processa a imagem como um todo, sendo eficaz na leitura de sequências de texto, como as encontradas em placas.</li>
+    </ul>
+    <p>O SPV pode utilizar um ou ambos os motores em paralelo, aproveitando a força de cada um e melhorando a acurácia geral do reconhecimento.</p>
   </section>
 
   <section class="section">
@@ -63,7 +109,7 @@
       <li><b>Lista dos arquivos:</b>
         <ul>
           <li><code>plates_recognizer.py</code> (código principal)</li>
-          <li><code>haarcascade_russian_plate_number.xml</code> (classificador Haar Cascade)</li>
+          <li><code>haarcascade_russian_plate_number.xml</code> (classificador Haar Cascade, fallback para detecção de placas)</li>
           <li><code>requirements.txt</code> (dependências)</li>
           <li><code>gerador_placa.html</code> (gerador de placas de teste)</li>
           <li>Imagens, vídeos e arquivos auxiliares na pasta <code>projeto/</code></li>
@@ -71,6 +117,31 @@
       </li>
       <li><b>Análise técnica:</b> O sistema atendeu ao contexto proposto, realizando detecção e leitura de placas em tempo real, com métricas qualitativas (acerto visual, facilidade de uso) e quantitativas (tempo de resposta, taxa de acerto em amostras).</li>
     </ul>
+
+    <h4>Detalhamento da Implementação do SPV</h4>
+    <p>O coração do nosso projeto é o script <code>plates_recognizer.py</code>, que implementa o pipeline de reconhecimento de forma modular e assíncrona.</p>
+    <ul>
+      <li><b>Captura e Calibração:</b> O sistema inicia a captura de vídeo da webcam e, se um arquivo de calibração for fornecido, aplica a correção de distorção a cada quadro.</li>
+      <li><b>Detecção Híbrida de ROIs:</b> Para encontrar as placas, usamos uma combinação de Haar Cascade (um método rápido baseado em aprendizado de máquina para detecção de objetos) e a detecção de contornos descrita anteriormente. Os resultados de ambos são unidos e filtrados para remover duplicatas.</li>
+      <li><b>OCR Assíncrono:</b> Para não travar a interface de vídeo, as ROIs candidatas são enviadas para um pool de processos de OCR que rodam em paralelo. Isso garante uma experiência de usuário fluida, mesmo enquanto o processamento mais pesado acontece em segundo plano.</li>
+      <li><b>Pré-processamento para OCR:</b> Antes de enviar ao motor de OCR, cada ROI passa por um pré-processamento específico para melhorar a legibilidade, como a aplicação de limiarização adaptativa, que binariza a imagem de forma inteligente, separando o texto do fundo.</li>
+    </ul>
+
+    <h4>Exemplo de Pré-processamento de Imagem</h4>
+    <div class="image-gallery">
+      <figure>
+        <img src="../projeto/plate_processing_sample/step0_original_frame.png" alt="Quadro Original">
+        <figcaption>1. Quadro Original</figcaption>
+      </figure>
+      <figure>
+        <img src="../projeto/plate_processing_sample/step1_gray_image (1).png" alt="Imagem em Escala de Cinza">
+        <figcaption>2. Escala de Cinza</figcaption>
+      </figure>
+      <figure>
+        <img src="../projeto/plate_processing_sample/step3_edges_canny_80_180.png" alt="Detecção de Bordas (Canny)">
+        <figcaption>3. Bordas (Canny)</figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="section">
@@ -85,12 +156,13 @@
     <div class="forms">
       <h4>Respostas do questionário do Google Forms</h4>
       <div style="display: flex; justify-content: center; gap: 18px; flex-direction: column;">
-        <img src="./q1.png" alt="" srcset="">
-        <img src="./q2.png" alt="" srcset="">
-        <img src="./q3.png" alt="" srcset="">
-        <img src="./q4.png" alt="" srcset="">
-        <img src="./q5.png" alt="" srcset="">
+        <img src="./q1.png" alt="Gráfico da pergunta 1" >
+        <img src="./q2.png" alt="Gráfico da pergunta 2" >
+        <img src="./q3.png" alt="Gráfico da pergunta 3" >
+        <img src="./q4.png" alt="Gráfico da pergunta 4" >
+        <img src="./q5.png" alt="Gráfico da pergunta 5" >
       </div>
+    </div>
     </div>
   </section>
 
@@ -124,9 +196,7 @@
   <section class="section">
     <h3>Apresentação em Vídeo</h3>
     <div class="video-container">
-      <video controls src="video-apresentacao.mp4" poster="../etapa_2/block-diagram-license-plate.png">
-        Seu navegador não suporta a tag de vídeo.
-      </video>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/GRdp6Undwl0?si=7h9SpGzXZkIytzg9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       <p class="muted">Demonstração do sistema SPV em funcionamento durante o Teste de Campo.</p>
     </div>
   </section>
