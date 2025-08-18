@@ -493,7 +493,7 @@ def main():
     parser.add_argument('--debug', action='store_true', help='Ativar logs de debug')
     parser.add_argument('--ultra', action='store_true', help='Preset ULTRA (mais FPS, menos acurácia)')
     parser.add_argument('--pool-size', type=int, default=None, help='Nº de processos de OCR')
-    parser.add_argument('--ocr-engine', type=str, default='easyocr', choices=['tesseract', 'easyocr', 'dual'], help='Motor de OCR a ser usado')
+    parser.add_argument('--ocr-engine', type=str, default='tesseract', choices=['tesseract', 'easyocr', 'dual'], help='Motor de OCR a ser usado')
     parser.add_argument('--cam-calib', type=str, default=None, help='Caminho para o arquivo de calibração de câmera (ex: camera_params.npz)')
     parser.add_argument('--calibrate', action='store_true', help='Modo de calibração de câmera. Use com --camera.')
     parser.add_argument('image_path', nargs='?', help='Caminho da imagem (modo estático)')
