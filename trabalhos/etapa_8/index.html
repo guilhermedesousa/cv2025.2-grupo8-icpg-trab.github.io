@@ -39,6 +39,32 @@
         background: #fff;
         margin-top: auto;
     }
+
+    .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .image-gallery figure {
+            margin: 0;
+            text-align: center;
+            width: calc(33% - 10px);
+        }
+
+        .image-gallery img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .image-gallery figcaption {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: var(--gray);
+        }
   </style>
 </head>
 <body>
@@ -109,7 +135,7 @@
   </section>
 
   <section class="slide">
-    <h2>4. Funcionamento do Sistema e Exemplos de Código</h2>
+    <h2>4. Funcionamento do Sistema e Demonstração</h2>
     <p>
       O sistema foi implementado em Python, com uma arquitetura modular e eficiente. A seguir, destacamos as principais etapas do pipeline, acompanhadas de exemplos reais do código-fonte:
     </p>
@@ -138,19 +164,39 @@ cv2.imshow("Reconhecimento de Placas - Live", frame)
     <p>
       O sistema também conta com funções para calibração de câmera, exportação dos resultados e interface de fácil operação, com atalhos de teclado para pausar, alternar debug e sair.
     </p>
+
+    <h4>Exemplo de Pré-processamento de Imagem</h4>
+    <div class="image-gallery">
+      <figure>
+        <img src="../projeto/plate_processing_sample/step0_original_frame.png" alt="Quadro Original">
+        <figcaption>1. Quadro Original</figcaption>
+      </figure>
+      <figure>
+        <img src="../projeto/plate_processing_sample/step1_gray_image (1).png" alt="Imagem em Escala de Cinza">
+        <figcaption>2. Escala de Cinza</figcaption>
+      </figure>
+      <figure>
+        <img src="../projeto/plate_processing_sample/step3_edges_canny_80_180.png" alt="Detecção de Bordas (Canny)">
+        <figcaption>3. Bordas (Canny)</figcaption>
+      </figure>
+      <figure>
+        <img src="../projeto/plate_processing_sample/step4_all_detected_regions.png" alt="Regiões de interesse">
+        <figcaption>4. Regiões de Interesse </figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="slide">
     <h2>5. Resultados e Avaliação</h2>
     <p>
-      O sistema foi avaliado em diferentes cenários, com placas reais e simuladas, sob variadas condições de iluminação e ângulo. Os resultados demonstraram boa robustez e precisão, especialmente em placas padrão Mercosul. Abaixo, um exemplo de tabela de resultados:
+      O sistema foi avaliado em diferentes cenários, com placas simuladas, sob variadas condições de iluminação e ângulo. Simulações de 15 placas diferentes em distâncias variadas, rodando em modo --dual (tesseract e easyocr) em um MacBook Air M1. Os resultados demonstraram boa robustez e precisão, especialmente em placas padrão Mercosul. Abaixo, um exemplo de tabela de resultados:
     </p>
     <table>
       <tr><th>Cenário</th><th>Taxa de Acerto</th><th>Tempo Médio (s)</th><th>Observações</th></tr>
-      <tr><td>Ambiente controlado (luz boa)</td><td>98%</td><td>0,7</td><td>Reconhecimento quase instantâneo</td></tr>
-      <tr><td>Luz natural (externo)</td><td>92%</td><td>1,1</td><td>Algumas falhas em placas sujas</td></tr>
-      <tr><td>Luz baixa</td><td>80%</td><td>1,5</td><td>Redução de precisão, mas ainda funcional</td></tr>
-      <tr><td>Placas inclinadas</td><td>75%</td><td>1,8</td><td>Maior dificuldade, mas detecta</td></tr>
+      <tr><td>Ambiente controlado (luz boa)</td><td>93%</td><td>2,3</td><td>Reconhecimento quase instantâneo</td></tr>
+      <tr><td>Luz natural (externo)</td><td>86%</td><td>3,2</td><td>Algumas falhas em placas sujas</td></tr>
+      <tr><td>Luz baixa</td><td>80%</td><td>5,4</td><td>Redução de precisão, mas ainda funcional</td></tr>
+      <tr><td>Placas inclinadas</td><td>40%</td><td>12,4</td><td>Maior dificuldade, dificilmente detecta, mas detecta em baixas inclinações</td></tr>
     </table>
     <p>
       O feedback dos usuários foi positivo, destacando a facilidade de uso e a utilidade prática do sistema. Sugestões de melhoria incluem aprimorar o reconhecimento em condições extremas e adicionar integração com bancos de dados.
@@ -168,9 +214,17 @@ cv2.imshow("Reconhecimento de Placas - Live", frame)
   </section>
 
   <section class="slide">
-    <h2>6. Conclusões</h2>
+    <h2>6. Demonstração em Vídeo</h2>
+    <div class="video-container">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/GRdp6Undwl0?si=7h9SpGzXZkIytzg9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <p class="muted">Demonstração do sistema SPV em funcionamento durante o Teste de Campo.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>7. Conclusões</h2>
     <p>
-      O projeto proporcionou uma experiência completa de desenvolvimento em visão computacional, desde a identificação de um problema real até a entrega de uma solução funcional e testada. Os principais aprendizados incluem:
+      O projeto proporcionou uma experiência completa de desenvolvimento em visão computacional, desde a identificação de um problema real até a entrega de uma solução funcional e testada. Dentre os aprendizados, os principais que o projeto nos proporcionou incluem:
     </p>
     <ul>
       <li>Integração de técnicas de processamento de imagens, detecção de objetos e OCR.</li>
@@ -179,18 +233,15 @@ cv2.imshow("Reconhecimento de Placas - Live", frame)
       <li>Valor do feedback dos usuários para aprimorar a solução.</li>
     </ul>
     <p>
-      O sistema está pronto para ser expandido, podendo ser integrado a sistemas maiores de controle de acesso, monitoramento e segurança.
+      Atingimos o objetivo principal de desenvolver um sistema de visão computacional para a leitura de placas.
     </p>
-  </section>
-
-  <section class="slide">
-    <h2>7. Demonstração em Vídeo</h2>
-    <div class="video-container">
-      <video controls src="../etapa_7/video-apresentacao.mp4" poster="../etapa_2/block-diagram-license-plate.png">
-        Seu navegador não suporta a tag de vídeo.
-      </video>
-      <p class="muted">Demonstração do sistema SPV em funcionamento durante o Teste de Campo.</p>
-    </div>
+    <h3>Explorações Futuras</h2>
+    <p>
+      O sistema desenvolvido oferece diversas oportunidades de expansão e aprimoramento, destacamos:      
+    </p>
+    <li>Integração com sistemas de monitoramento em tempo real, fornecendo uma API para acesso aos dados.</li>
+      <li>Melhoria na detecção de placas em condições adversas, usando modelos de machine learning.</li>
+      <li>Expansão para reconhecimento de características dos veículos.</li>
   </section>
 
   <section class="slide">
