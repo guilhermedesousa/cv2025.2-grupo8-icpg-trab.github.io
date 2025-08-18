@@ -151,14 +151,16 @@ blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 edges = cv2.Canny(blurred, 30, 100)
 </code></pre>
     <h3>Detecção de regiões de placa</h3>
-    <pre><code>regions = plate_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(80, 20), maxSize=(400, 140))
+    <pre><code>regions = plate_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3,
+minSize=(80, 20), maxSize=(400, 140))
 </code></pre>
     <h3>Reconhecimento de caracteres (OCR)</h3>
     <pre><code>import pytesseract
 text = pytesseract.image_to_string(roi, config='--oem 3 --psm 7')
 </code></pre>
     <h3>Exibição dos resultados</h3>
-    <pre><code>cv2.putText(frame, f"Placa: {label}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (255,255,255), 2)
+    <pre><code>cv2.putText(frame, f"Placa: {label}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.1,
+(255,255,255), 2)
 cv2.imshow("Reconhecimento de Placas - Live", frame)
 </code></pre>
     <p>
