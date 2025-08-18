@@ -16,6 +16,14 @@ Recursos:
 
 Atalhos na janela:
   q = sair | d = alterna debug | p = pausa
+
+---
+
+Discentes:
+- Ian Victor Toniolo Silva - 11202020351
+- Pedro Henrique Cardoso Silva - 1120202127
+- Guilherme de Sousa Santos - 11201921175
+  
 """
 
 import os
